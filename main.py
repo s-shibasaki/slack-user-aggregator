@@ -1,18 +1,20 @@
 import glob
 import os
-import pandas as pd
+
 import click
+import pandas as pd
 
 
 @click.command()
 @click.option("--input-dir")
-@click.option("--output")
+@click.option("--output-dir")
 def main(input_dir: str, output_dir: str = None):
+    print(input_dir)
     if output_dir is None:
         print("Argument `output_dir` is not set, we will save to `input_dir`.")
         output_dir = input_dir
-    files = glob.glob(input_dir + "/*.csv")
-    files = list(filter(lambda x: x.endswith("aggregator_output.csv"), files))
+    files = glob.glob(os.path.join(input_dir, "*.csv"))
+    files = list(filter(lambda x: not x.endswith("aggregator_output.csv"), files))
     print("Merging the files below...")
     for file in files:
         print(f"  - {file}")
@@ -28,3 +30,7 @@ def main(input_dir: str, output_dir: str = None):
         lambda x: " / ".join(x.fillna("").astype("str").unique())
     )
     df.to_csv(os.path.join(output_dir, "aggregator_output.csv"))
+
+
+if __name__ == "__main__":
+    main()
